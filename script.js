@@ -3,7 +3,7 @@ function handleCredentialResponse(response) {
     alert("Login Successful!");
 }
 
-let camera, scene, renderer;
+let camera, scene, renderer, controls;
 let objects = [];
 let targets = { table: [], sphere: [], helix: [], grid: [] };
 
@@ -26,6 +26,14 @@ function init() {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
+    // ✅ Orbit Controls (ZOOM FIX)
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+    controls.minDistance = 500;
+    controls.maxDistance = 6000;
 
     window.addEventListener("resize", onWindowResize);
 }
@@ -51,12 +59,12 @@ function createTiles(data) {
         const element = document.createElement("div");
         element.className = "element";
 
-        // 🌸 Smooth Pink Gradient Based on Net Worth 🌸
-        const maxWorth = 400000; 
+        // 🌸 Smooth Pink Gradient
+        const maxWorth = 400000;
         const ratio = Math.min(netWorth / maxWorth, 1);
 
-        const lightPink = [255, 182, 193];  // pastel pink
-        const darkPink = [199, 21, 133];    // deep pink
+        const lightPink = [255, 182, 193];
+        const darkPink = [199, 21, 133];
 
         const r = Math.floor(lightPink[0] + ratio * (darkPink[0] - lightPink[0]));
         const g = Math.floor(lightPink[1] + ratio * (darkPink[1] - lightPink[1]));
@@ -80,7 +88,6 @@ function createTiles(data) {
         objects.push(object);
     }
 }
-
 
 function initLayouts() {
 
@@ -161,6 +168,7 @@ function transform(targetsArray, duration) {
 function animate() {
     requestAnimationFrame(animate);
     TWEEN.update();
+    controls.update(); // ✅ important
     render();
 }
 

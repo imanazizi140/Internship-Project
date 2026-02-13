@@ -5,14 +5,18 @@
     <title>Internship Assignment</title>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/renderers/CSS3DRenderer.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <style>
-        body { margin: 0; overflow: hidden; background: #111; font-family: Arial; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: linear-gradient(to bottom, #ffe6f0, #ffd6eb);
+            font-family: Arial; 
+        }
 
         .element {
             width: 120px;
@@ -22,7 +26,7 @@
             padding: 10px;
             color: white;
             box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
-}
+        }
 
         img {
             border-radius: 50%;
@@ -40,8 +44,11 @@
             padding: 8px 12px;
             margin: 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
+            background-color: #ff69b4;
+            color: white;
+            font-weight: bold;
         }
     </style>
 </head>
