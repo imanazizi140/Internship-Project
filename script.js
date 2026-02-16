@@ -1,8 +1,20 @@
 function handleCredentialResponse(response) {
-    console.log("JWT:", response.credential);
-    alert("Login Successful!");
-}
 
+    console.log("JWT:", response.credential);
+    document.querySelector(".login-container").style.display = "none";
+
+    renderer.domElement.style.display = "block";
+    document.getElementById("layoutMenu").style.display = "block";
+
+    fetch(SHEET_URL)
+        .then(res => res.json())
+        .then(data => {
+            createTiles(data);
+            initLayouts();
+            transform(targets.table, 2000);
+        })
+        .catch(err => console.error(err));
+}
 let camera, scene, renderer, controls;
 let objects = [];
 let targets = { table: [], sphere: [], helix: [], grid: [] };
@@ -26,8 +38,8 @@ function init() {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    renderer.domElement.style.display = "none";
 
-    // ✅ Orbit Controls (ZOOM FIX)
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableZoom = true;
     controls.enablePan = true;
@@ -43,7 +55,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-
 function createTiles(data) {
 
     for (let i = 1; i < data.length; i++) {
@@ -59,7 +70,6 @@ function createTiles(data) {
         const element = document.createElement("div");
         element.className = "element";
 
-        // 🌸 Smooth Pink Gradient
         const maxWorth = 400000;
         const ratio = Math.min(netWorth / maxWorth, 1);
 
@@ -88,7 +98,6 @@ function createTiles(data) {
         objects.push(object);
     }
 }
-
 function initLayouts() {
 
     targets = { table: [], sphere: [], helix: [], grid: [] };
@@ -148,7 +157,6 @@ function initLayouts() {
         targets.sphere.push(object);
     }
 }
-
 function transform(targetsArray, duration) {
 
     for (let i = 0; i < objects.length; i++) {
@@ -164,25 +172,14 @@ function transform(targetsArray, duration) {
         .onUpdate(render)
         .start();
 }
-
 function animate() {
     requestAnimationFrame(animate);
     TWEEN.update();
-    controls.update(); // ✅ important
+    controls.update();
     render();
 }
 
 function render() {
     renderer.render(scene, camera);
 }
-
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxqeRTNrCjlvTakh8RfGC2An1vdUAzJzn8DkXi9O_YxVIOkd89ygm7yUHr4mhpDfxxp/exec";
-
-fetch(SHEET_URL)
-    .then(res => res.json())
-    .then(data => {
-        createTiles(data);
-        initLayouts();
-        transform(targets.table, 2000);
-    })
-    .catch(err => console.error(err));

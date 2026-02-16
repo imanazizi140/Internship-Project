@@ -5,9 +5,11 @@
     <title>Internship Assignment</title>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/renderers/CSS3DRenderer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <style>
@@ -31,13 +33,14 @@
         img {
             border-radius: 50%;
         }
-
+        
         .menu {
             position: absolute;
             bottom: 20px;
             width: 100%;
             text-align: center;
             z-index: 10;
+            display: none;
         }
 
         button {
@@ -50,6 +53,14 @@
             color: white;
             font-weight: bold;
         }
+
+        /* Center login nicely */
+        .login-container {
+            position: absolute;
+            top: 40%;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -60,9 +71,11 @@
      data-callback="handleCredentialResponse">
 </div>
 
-<div class="g_id_signin" style="position:absolute; top:10px; left:10px;"></div>
+<div class="login-container">
+    <div class="g_id_signin"></div>
+</div>
 
-<div class="menu">
+<div class="menu" id="layoutMenu">
     <button onclick="transform(targets.table,2000)">Table</button>
     <button onclick="transform(targets.sphere,2000)">Sphere</button>
     <button onclick="transform(targets.helix,2000)">Helix</button>
