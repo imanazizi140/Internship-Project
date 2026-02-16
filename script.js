@@ -1,10 +1,38 @@
+let camera, scene, renderer, controls;
+let objects = [];
+let targets = { table: [], sphere: [], helix: [], grid: [] };
+
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxqeRTNrCjlvTakh8RfGC2An1vdUAzJzn8DkXi9O_YxVIOkd89ygm7yUHr4mhpDfxxp/exec";
+
+init();
+animate();
+
 function handleCredentialResponse(response) {
 
-    console.log("JWT:", response.credential);
+    const user = parseJwt(response.credential);
+
+    console.log("Logged in user:", user);
+
     document.querySelector(".login-container").style.display = "none";
 
     renderer.domElement.style.display = "block";
     document.getElementById("layoutMenu").style.display = "block";
+
+    const userBox = document.getElementById("userInfo");
+    userBox.style.display = "block";
+    userBox.innerHTML = `
+        <img src="${user.picture}" 
+             style="width:40px;height:40px;border-radius:50%;vertical-align:middle;">
+        <span style="margin-left:10px;font-weight:bold;">
+            ${user.name}
+        </span>
+        <button onclick="logout()" 
+            style="margin-left:15px;padding:5px 10px;border:none;
+                   border-radius:15px;background:#ff69b4;
+                   color:white;cursor:pointer;">
+            Logout
+        </button>
+    `;
 
     fetch(SHEET_URL)
         .then(res => res.json())
@@ -15,12 +43,23 @@ function handleCredentialResponse(response) {
         })
         .catch(err => console.error(err));
 }
-let camera, scene, renderer, controls;
-let objects = [];
-let targets = { table: [], sphere: [], helix: [], grid: [] };
 
-init();
-animate();
+function logout() {
+    google.accounts.id.disableAutoSelect();
+    location.reload();
+}
+
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+        atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+    );
+    return JSON.parse(jsonPayload);
+}
 
 function init() {
 
@@ -38,6 +77,7 @@ function init() {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
     renderer.domElement.style.display = "none";
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -55,6 +95,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
 function createTiles(data) {
 
     for (let i = 1; i < data.length; i++) {
@@ -63,9 +104,7 @@ function createTiles(data) {
         const photo = data[i][1];
         const netWorthRaw = data[i][5];
 
-        const netWorth = parseFloat(
-            netWorthRaw.replace(/[^0-9.]/g, "")
-        );
+        const netWorth = parseFloat(netWorthRaw.replace(/[^0-9.]/g, ""));
 
         const element = document.createElement("div");
         element.className = "element";
@@ -157,6 +196,7 @@ function initLayouts() {
         targets.sphere.push(object);
     }
 }
+
 function transform(targetsArray, duration) {
 
     for (let i = 0; i < objects.length; i++) {
@@ -172,6 +212,7 @@ function transform(targetsArray, duration) {
         .onUpdate(render)
         .start();
 }
+
 function animate() {
     requestAnimationFrame(animate);
     TWEEN.update();
@@ -182,4 +223,3 @@ function animate() {
 function render() {
     renderer.render(scene, camera);
 }
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxqeRTNrCjlvTakh8RfGC2An1vdUAzJzn8DkXi9O_YxVIOkd89ygm7yUHr4mhpDfxxp/exec";
