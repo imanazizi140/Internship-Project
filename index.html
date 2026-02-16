@@ -1,71 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Internship Assignment</title>
+<meta charset="utf-8">
+<title>3D Data Visualization – Internship Assignment</title>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/renderers/CSS3DRenderer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/renderers/CSS3DRenderer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
-    <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: linear-gradient(to bottom, #ffe6f0, #ffd6eb);
-            font-family: Arial; 
-        }
+<style>
 
-        .element {
-            width: 120px;
-            height: 170px;
-            text-align: center;
-            border-radius: 15px;
-            padding: 10px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
-        }
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #0f0f0f;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+.element {
+    width: 130px;
+    height: 180px;
+    border-radius: 12px;
+    text-align: center;
+    padding: 12px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+}
 
-        img {
-            border-radius: 50%;
-        }
-        
-        .menu {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            z-index: 10;
-            display: none;
-        }
+.element:hover {
+    transform: scale(1.05);
+}
 
-        button {
-            padding: 8px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            background-color: #ff69b4;
-            color: white;
-            font-weight: bold;
-        }
+.element img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
 
-        /* Center login nicely */
-        .login-container {
-            position: absolute;
-            top: 40%;
-            width: 100%;
-            text-align: center;
-        }
-    </style>
+.login-container {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+}
+#userInfo {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    display: none;
+    z-index: 10;
+}
+.menu {
+    position: absolute;
+    bottom: 25px;
+    width: 100%;
+    text-align: center;
+    display: none;
+    z-index: 10;
+}
+
+.menu button {
+    padding: 10px 16px;
+    margin: 6px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    background: #1f1f1f;
+    color: white;
+    border: 1px solid #444;
+    transition: 0.2s ease;
+}
+
+.menu button:hover {
+    background: #333;
+}
+
+#legend {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    display: none;
+    align-items: center;
+    font-size: 13px;
+    z-index: 10;
+}
+
+#legend span {
+    margin: 0 8px;
+}
+
+.color-bar {
+    width: 180px;
+    height: 15px;
+    border-radius: 10px;
+    background: linear-gradient(to right, red, orange, green);
+}
+
+</style>
 </head>
 
 <body>
-<div id="userInfo" style="position:absolute; top:10px; right:20px; display:none;"></div>
+
+<div id="userInfo"></div>
 <div id="g_id_onload"
      data-client_id="401696009090-7dd0t8a9sq2vaprrefflukv0o7iuagb8.apps.googleusercontent.com"
      data-callback="handleCredentialResponse">
@@ -82,6 +124,11 @@
     <button onclick="transform(targets.grid,2000)">Grid</button>
 </div>
 
+<div id="legend">
+    <span>LOW</span>
+    <div class="color-bar"></div>
+    <span>HIGH</span>
+</div>
 <script src="script.js"></script>
 
 </body>

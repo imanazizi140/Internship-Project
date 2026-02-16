@@ -11,25 +11,17 @@ function handleCredentialResponse(response) {
 
     const user = parseJwt(response.credential);
 
-    console.log("Logged in user:", user);
-
     document.querySelector(".login-container").style.display = "none";
-
     renderer.domElement.style.display = "block";
     document.getElementById("layoutMenu").style.display = "block";
+    document.getElementById("legend").style.display = "flex";
 
     const userBox = document.getElementById("userInfo");
     userBox.style.display = "block";
     userBox.innerHTML = `
-        <img src="${user.picture}" 
-             style="width:40px;height:40px;border-radius:50%;vertical-align:middle;">
-        <span style="margin-left:10px;font-weight:bold;">
-            ${user.name}
-        </span>
-        <button onclick="logout()" 
-            style="margin-left:15px;padding:5px 10px;border:none;
-                   border-radius:15px;background:#ff69b4;
-                   color:white;cursor:pointer;">
+        <img src="${user.picture}" style="width:40px;height:40px;border-radius:50%;vertical-align:middle;">
+        <span style="margin-left:10px;font-weight:bold;">${user.name}</span>
+        <button onclick="logout()" style="margin-left:15px;padding:6px 12px;border-radius:20px;background:#222;color:white;border:1px solid #555;cursor:pointer;">
             Logout
         </button>
     `;
@@ -40,8 +32,7 @@ function handleCredentialResponse(response) {
             createTiles(data);
             initLayouts();
             transform(targets.table, 2000);
-        })
-        .catch(err => console.error(err));
+        });
 }
 
 function logout() {
@@ -53,23 +44,14 @@ function parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
-        atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
+        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
     );
     return JSON.parse(jsonPayload);
 }
 
 function init() {
 
-    camera = new THREE.PerspectiveCamera(
-        40,
-        window.innerWidth / window.innerHeight,
-        1,
-        10000
-    );
-
+    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 3000;
 
     scene = new THREE.Scene();
@@ -77,13 +59,9 @@ function init() {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
     renderer.domElement.style.display = "none";
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = true;
-    controls.enablePan = true;
-    controls.enableRotate = true;
     controls.minDistance = 500;
     controls.maxDistance = 6000;
 
@@ -103,28 +81,23 @@ function createTiles(data) {
         const name = data[i][0];
         const photo = data[i][1];
         const netWorthRaw = data[i][5];
-
         const netWorth = parseFloat(netWorthRaw.replace(/[^0-9.]/g, ""));
 
         const element = document.createElement("div");
         element.className = "element";
 
-        const maxWorth = 400000;
-        const ratio = Math.min(netWorth / maxWorth, 1);
-
-        const lightPink = [255, 182, 193];
-        const darkPink = [199, 21, 133];
-
-        const r = Math.floor(lightPink[0] + ratio * (darkPink[0] - lightPink[0]));
-        const g = Math.floor(lightPink[1] + ratio * (darkPink[1] - lightPink[1]));
-        const b = Math.floor(lightPink[2] + ratio * (darkPink[2] - lightPink[2]));
-
-        element.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        if (netWorth < 100000) {
+            element.style.backgroundColor = "red";
+        } else if (netWorth < 200000) {
+            element.style.backgroundColor = "orange";
+        } else {
+            element.style.backgroundColor = "green";
+        }
 
         element.innerHTML = `
-            <img src="${photo}" width="80" height="80"><br>
-            <strong>${name}</strong><br>
-            $${netWorth.toLocaleString()}
+            <img src="${photo}">
+            <div style="font-weight:bold;font-size:14px;">${name}</div>
+            <div style="margin-top:6px;font-size:13px;">$${netWorth.toLocaleString()}</div>
         `;
 
         const object = new THREE.CSS3DObject(element);
@@ -137,45 +110,69 @@ function createTiles(data) {
         objects.push(object);
     }
 }
+
 function initLayouts() {
 
     targets = { table: [], sphere: [], helix: [], grid: [] };
 
     const tableCols = 20;
-    const tableRows = Math.ceil(objects.length / tableCols);
+    const tableRows = 10;
+    const spacingX = 170;
+    const spacingY = 220;
 
     for (let i = 0; i < objects.length; i++) {
+
+        const object = new THREE.Object3D();
 
         const row = Math.floor(i / tableCols);
         const col = i % tableCols;
 
-        const object = new THREE.Object3D();
-        object.position.x = (col - tableCols / 2) * 150;
-        object.position.y = -(row - tableRows / 2) * 180;
+        object.position.x = (col - tableCols / 2) * spacingX;
+        object.position.y = -(row - tableRows / 2) * spacingY;
+        object.position.z = 0;
 
         targets.table.push(object);
     }
 
+    const radius = 900;
+    const separation = 150;
+    const angleStep = 0.4;
+
     for (let i = 0; i < objects.length; i++) {
 
         const object = new THREE.Object3D();
-        const angle = i * 0.3;
-        const radius = 900;
 
-        object.position.x = radius * Math.cos(angle);
-        object.position.y = (i - objects.length / 2) * 20;
-        object.position.z = radius * Math.sin(angle);
+        const strand = i % 2;
+        const index = Math.floor(i / 2);
+        const angle = index * angleStep;
+
+        const x = radius * Math.cos(angle);
+        const z = radius * Math.sin(angle);
+        const y = (index - objects.length / 4) * 35;
+
+        object.position.x = x + (strand === 0 ? -separation : separation);
+        object.position.y = y;
+        object.position.z = z;
 
         targets.helix.push(object);
     }
 
+    const cols = 10;
+    const rows = 4;
+    const layersize = cols * rows;
+    const spacing = 300;
+
     for (let i = 0; i < objects.length; i++) {
 
         const object = new THREE.Object3D();
 
-        const x = ((i % 5) - 2) * 400;
-        const y = (-(Math.floor(i / 5) % 5) + 2) * 400;
-        const z = (Math.floor(i / 25) - 2) * 400;
+        const col = i % cols;
+        const row = Math.floor(i / cols) % rows;
+        const layer = Math.floor(i / layersize);
+
+        const x = (col - cols / 2) * spacing;
+        const y = -(row - rows / 2) * spacing;
+        const z = -layer * spacing * 1.5;
 
         object.position.set(x, y, z);
 
@@ -189,9 +186,9 @@ function initLayouts() {
         const phi = Math.acos(-1 + (2 * i) / objects.length);
         const theta = Math.sqrt(objects.length * Math.PI) * phi;
 
-        object.position.x = 800 * Math.cos(theta) * Math.sin(phi);
-        object.position.y = 800 * Math.sin(theta) * Math.sin(phi);
-        object.position.z = 800 * Math.cos(phi);
+        object.position.x = 900 * Math.cos(theta) * Math.sin(phi);
+        object.position.y = 900 * Math.sin(theta) * Math.sin(phi);
+        object.position.z = 900 * Math.cos(phi);
 
         targets.sphere.push(object);
     }
