@@ -11,7 +11,7 @@ function handleCredentialResponse(response) {
 
     const user = parseJwt(response.credential);
 
-    document.querySelector(".login-container").style.display = "none";
+    document.querySelector(".login-wrapper").style.display = "none";
     renderer.domElement.style.display = "block";
     document.getElementById("layoutMenu").style.display = "block";
     document.getElementById("legend").style.display = "flex";
@@ -123,7 +123,6 @@ function initLayouts() {
     for (let i = 0; i < objects.length; i++) {
 
         const object = new THREE.Object3D();
-
         const row = Math.floor(i / tableCols);
         const col = i % tableCols;
 
@@ -159,7 +158,7 @@ function initLayouts() {
 
     const cols = 10;
     const rows = 4;
-    const layersize = cols * rows;
+    const layerSize = cols * rows;
     const spacing = 300;
 
     for (let i = 0; i < objects.length; i++) {
@@ -168,14 +167,13 @@ function initLayouts() {
 
         const col = i % cols;
         const row = Math.floor(i / cols) % rows;
-        const layer = Math.floor(i / layersize);
+        const layer = Math.floor(i / layerSize);
 
         const x = (col - cols / 2) * spacing;
         const y = -(row - rows / 2) * spacing;
         const z = -layer * spacing * 1.5;
 
         object.position.set(x, y, z);
-
         targets.grid.push(object);
     }
 
@@ -197,7 +195,6 @@ function initLayouts() {
 function transform(targetsArray, duration) {
 
     for (let i = 0; i < objects.length; i++) {
-
         new TWEEN.Tween(objects[i].position)
             .to(targetsArray[i].position, duration)
             .easing(TWEEN.Easing.Exponential.InOut)
